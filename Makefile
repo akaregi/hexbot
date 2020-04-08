@@ -1,31 +1,26 @@
 NAME=hexbot
 VERSION=latest
+SH=ash
 
 TAG=$(NAME):$(VERSION)
 
 .PHONY: build
 build:
 	-@make -s stop
-	@echo *** docker build
-	@docker build --tag $(TAG) .
+	docker build --tag $(TAG) .
 
 .PHONY: start
 start:
-	@echo *** docker run
-	@docker run --interactive --tty --detach --volume "%CD%":/workspace --name $(NAME) \
-		$(TAG) ash
+	docker run -it -d -v "%CD%":/workspace --name $(NAME) $(TAG) $(SH)
 
 .PHONY: stop
 stop:
-	@echo *** docker rm
-	docker rm --force --volumes $(NAME)
+	docker rm -f -v $(NAME)
 
 .PHONY: exec
 exec:
-	@echo *** docker exec
-	@docker exec --interactive --tty $(NAME) /bin/ash
+	docker exec -it $(NAME) $(SH)
 
 .PHONY: clean
 clean:
-	@echo *** docker rmi
-	@docker rmi --force $(NAME)
+	docker rmi -f $(NAME)
